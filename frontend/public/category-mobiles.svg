@@ -1,0 +1,13 @@
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mobileGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff3e0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffcc02;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#mobileGradient)" rx="8"/>
+  <text x="64" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#f57c00">📱</text>
+  <text x="64" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#424242">
+    Mobiles
+  </text>
+</svg>

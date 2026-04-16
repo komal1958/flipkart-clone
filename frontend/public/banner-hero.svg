@@ -1,0 +1,22 @@
+<svg width="1200" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bannerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2874f0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e5bb8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#bannerGradient)"/>
+  <text x="100" y="120" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white">
+    Big Billion Days Sale
+  </text>
+  <text x="100" y="170" font-family="Arial, sans-serif" font-size="24" fill="white">
+    Up to 80% off on top brands
+  </text>
+  <text x="100" y="220" font-family="Arial, sans-serif" font-size="18" fill="#e0e0e0">
+    Shop now and save big!
+  </text>
+  <circle cx="900" cy="200" r="80" fill="rgba(255,255,255,0.1)"/>
+  <text x="880" y="210" font-family="Arial, sans-serif" font-size="36" fill="white">🛍️</text>
+  <circle cx="950" cy="150" r="40" fill="rgba(255,255,255,0.1)"/>
+  <text x="940" y="160" font-family="Arial, sans-serif" font-size="24" fill="white">💰</text>
+</svg>

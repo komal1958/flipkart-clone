@@ -1,0 +1,124 @@
+.orders-page {
+  background: var(--fk-bg);
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+
+.orders-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.orders-title {
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: var(--fk-text);
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.order-card {
+  background: white;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.order-card-header {
+  display: flex;
+  gap: 32px;
+  padding: 14px 20px;
+  background: #f5f5f5;
+  border-bottom: 1px solid var(--fk-border);
+  flex-wrap: wrap;
+}
+
+.order-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--fk-subtext);
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.order-code {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: monospace;
+  color: var(--fk-text);
+}
+
+.order-date, .order-total {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fk-text);
+}
+
+.order-status {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.order-card-body {
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.order-address {
+  font-size: 13px;
+  color: var(--fk-subtext);
+  flex: 1;
+}
+
+.view-order-btn {
+  background: none;
+  border: 1px solid var(--fk-blue);
+  color: var(--fk-blue);
+  padding: 8px 20px;
+  border-radius: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.view-order-btn:hover { background: #f0f4ff; }
+
+/* No orders */
+.no-orders {
+  text-align: center;
+  padding: 60px;
+  background: white;
+  border-radius: 2px;
+}
+
+.no-orders h2 {
+  font-size: 22px;
+  margin: 12px 0 8px;
+}
+
+.no-orders p {
+  color: var(--fk-subtext);
+  margin-bottom: 20px;
+}
+
+.shop-now-link {
+  display: inline-block;
+  background: var(--fk-blue);
+  color: white;
+  padding: 12px 32px;
+  border-radius: 2px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+}

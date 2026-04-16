@@ -1,0 +1,17 @@
+<svg width="200" height="60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2874f0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e5bb8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="200" height="60" fill="url(#logoGradient)" rx="8"/>
+  <text x="25" y="20" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">
+    flipkart
+  </text>
+  <text x="25" y="40" font-family="Arial, sans-serif" font-size="10" fill="rgba(255,255,255,0.8)">
+    clone
+  </text>
+  <circle cx="160" cy="30" r="15" fill="rgba(255,255,255,0.2)"/>
+  <text x="155" y="35" font-family="Arial, sans-serif" font-size="12" fill="white">🛒</text>
+</svg>
