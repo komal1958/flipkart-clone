@@ -24,6 +24,16 @@
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
+
+  /* Flipkart specific colors */
+  --fk-blue: #2874f0;
+  --fk-orange: #fb641b;
+  --fk-green: #00d09c;
+  --fk-red: #ff4757;
+  --fk-bg: #f1f3f6;
+  --fk-border: #e0e0e0;
+  --fk-text: #212121;
+  --fk-subtext: #666666;
 }
 
 * {

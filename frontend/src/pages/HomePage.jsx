@@ -29,7 +29,12 @@ const HomePage = () => {
   const activeCategory = searchParams.get('category') || '';
 
   useEffect(() => {
-    getCategories().then(res => setCategories(res.data.data || []));
+    getCategories()
+      .then(res => setCategories(res.data?.data || []))
+      .catch((error) => {
+        console.error('Error loading categories:', error);
+        setCategories([]);
+      });
   }, []);
 
   useEffect(() => {
@@ -40,9 +45,16 @@ const HomePage = () => {
     if (sortBy) params.sort = sortBy;
 
     getProducts(params)
-      .then(res => setProducts(res.data.data || []))
-      .catch(() => setProducts([]))
-      .finally(() => setLoading(false));
+      .then(res => {
+        setProducts(res.data?.data || []);
+      })
+      .catch((error) => {
+        console.error('Error loading products:', error);
+        setProducts([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [searchQuery, activeCategory, sortBy]);
 
   const handleCategory = (catName) => {

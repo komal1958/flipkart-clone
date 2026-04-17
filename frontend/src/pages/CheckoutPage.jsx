@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContent';
 import { placeOrder } from '../services/api';
@@ -14,20 +14,56 @@ const INDIAN_STATES = [
 ];
 
 const CheckoutPage = () => {
-  const { cartItems, cartTotal, sessionId, fetchCart } = useCart();
+  const { cart, sessionId, loadCart } = useCart();
   const navigate = useNavigate();
-  const [placing, setPlacing] = useState(false);
-  const [step, setStep] = useState(1); // 1 = address, 2 = review
+  const [step, setStep] = useState(1); // 1 = address, 2 = payment, 3 = review
+
+  const cartItems = cart || [];
+  const cartTotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   const [form, setForm] = useState({
     name: '', phone: '', email: '',
     address: '', city: '', state: '', pincode: '',
   });
   const [errors, setErrors] = useState({});
+  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [deliveryOption, setDeliveryOption] = useState('standard');
+  const [showThankYou, setShowThankYou] = useState(false);
+  const [showPaymentComplete, setShowPaymentComplete] = useState(false);
 
-  const delivery = cartTotal > 499 ? 0 : 40;
+  const delivery = (cartTotal > 499 && deliveryOption === 'standard') ? 0 : 
+                   deliveryOption === 'express' ? 100 : 40;
   const savings = cartItems.reduce((s, i) => s + (i.mrp - i.price) * i.quantity, 0);
   const finalTotal = cartTotal + delivery;
+
+  // Handle redirect after thank you window
+  useEffect(() => {
+    if (showThankYou) {
+      const timer = setTimeout(() => {
+        setShowThankYou(false);
+        setStep(1);
+        setForm({
+          name: '', phone: '', email: '',
+          address: '', city: '', state: '', pincode: '',
+        });
+        navigate('/', { replace: true });
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showThankYou, navigate]);
+
+  // Handle payment completion animation transition
+  useEffect(() => {
+    if (showPaymentComplete) {
+      const timer = setTimeout(() => {
+        setShowPaymentComplete(false);
+        setStep(3);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showPaymentComplete]);
 
   const handleChange = (e) => {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }));
@@ -51,16 +87,27 @@ const CheckoutPage = () => {
     if (validate()) setStep(2);
   };
 
+  const handleContinueToReview = () => {
+    // Show payment completion animation
+    setShowPaymentComplete(true);
+    // The transition to review step is handled by useEffect
+  };
+
   const handlePlaceOrder = async () => {
     setPlacing(true);
     try {
-      const res = await placeOrder({ sessionId, shippingAddress: form });
+      const res = await placeOrder({
+        sessionId,
+        shippingAddress: { ...form, paymentMethod, deliveryOption }
+      });
       const { orderCode } = res.data.data;
-      await fetchCart();
-      navigate(`/order-confirmation/${orderCode}`);
+      await loadCart(sessionId);
+
+      // Show thank you message - redirect will be handled by useEffect
+      setShowThankYou(true);
+
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to place order. Please try again.');
-    } finally {
       setPlacing(false);
     }
   };
@@ -74,7 +121,6 @@ const CheckoutPage = () => {
     <div className="checkout-page">
       <div className="checkout-container">
 
-        {/* Steps indicator */}
         <div className="checkout-steps">
           <div className={`step ${step >= 1 ? 'active' : ''}`}>
             <span className="step-num">1</span>
@@ -83,12 +129,12 @@ const CheckoutPage = () => {
           <div className="step-line" />
           <div className={`step ${step >= 2 ? 'active' : ''}`}>
             <span className="step-num">2</span>
-            <span className="step-label">ORDER SUMMARY</span>
+            <span className="step-label">PAYMENT</span>
           </div>
           <div className="step-line" />
           <div className={`step ${step >= 3 ? 'active' : ''}`}>
             <span className="step-num">3</span>
-            <span className="step-label">PAYMENT</span>
+            <span className="step-label">REVIEW</span>
           </div>
         </div>
 
@@ -160,8 +206,78 @@ const CheckoutPage = () => {
               </div>
             )}
 
-            {/* ── STEP 2: Review ── */}
+            {/* ── STEP 2: Payment Method ── */}
             {step === 2 && (
+              <div className="checkout-card">
+                <h2 className="checkout-card-title">Payment Method</h2>
+
+                {/* Delivery Options */}
+                <div className="delivery-options-section">
+                  <h3 style={{ fontSize: 15, fontWeight: 500, marginBottom: 12 }}>Choose Delivery Option</h3>
+                  <label className="delivery-option">
+                    <input
+                      type="radio"
+                      name="delivery"
+                      value="standard"
+                      checked={deliveryOption === 'standard'}
+                      onChange={(e) => setDeliveryOption(e.target.value)}
+                    />
+                    <div className="delivery-info">
+                      <span className="delivery-name">🚚 Standard Delivery</span>
+                      <span className="delivery-desc">Delivered in 3-5 business days</span>
+                      <span className="delivery-price">FREE</span>
+                    </div>
+                  </label>
+                  <label className="delivery-option">
+                    <input
+                      type="radio"
+                      name="delivery"
+                      value="express"
+                      checked={deliveryOption === 'express'}
+                      onChange={(e) => setDeliveryOption(e.target.value)}
+                    />
+                    <div className="delivery-info">
+                      <span className="delivery-name">⚡ Express Delivery</span>
+                      <span className="delivery-desc">Delivered in 1-2 business days</span>
+                      <span className="delivery-price">₹100</span>
+                    </div>
+                  </label>
+                </div>
+
+                <hr style={{ margin: '20px 0', borderColor: 'var(--fk-border)' }} />
+
+                {/* Payment Options */}
+                <div className="payment-section">
+                  <h3 style={{ fontSize: 15, fontWeight: 500, marginBottom: 12 }}>Choose Payment Method</h3>
+                  <label className="payment-option">
+                    <input type="radio" name="payment" value="cod" checked={paymentMethod === 'cod'} onChange={(e) => setPaymentMethod(e.target.value)} />
+                    <span>💵 Cash on Delivery</span>
+                  </label>
+                  <label className="payment-option">
+                    <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={(e) => setPaymentMethod(e.target.value)} />
+                    <span>💳 Credit/Debit Card</span>
+                  </label>
+                  <label className="payment-option">
+                    <input type="radio" name="payment" value="upi" checked={paymentMethod === 'upi'} onChange={(e) => setPaymentMethod(e.target.value)} />
+                    <span>📱 UPI</span>
+                  </label>
+                  <label className="payment-option">
+                    <input type="radio" name="payment" value="netbanking" checked={paymentMethod === 'netbanking'} onChange={(e) => setPaymentMethod(e.target.value)} />
+                    <span>🏦 Net Banking</span>
+                  </label>
+                </div>
+
+                <div className="step-navigation">
+                  <button className="back-btn" onClick={() => setStep(1)}>← Back</button>
+                  <button className="continue-btn" onClick={handleContinueToReview}>
+                    CONTINUE TO REVIEW
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── STEP 3: Review ── */}
+            {step === 3 && (
               <div className="checkout-card">
                 <div className="review-address-header">
                   <div>
@@ -171,7 +287,29 @@ const CheckoutPage = () => {
                     </p>
                     <p className="review-phone">📞 {form.phone}</p>
                   </div>
-                  <button className="change-btn" onClick={() => setStep(1)}>Change</button>
+                  <div className="review-action-buttons">
+                    <button className="change-btn" onClick={() => setStep(1)}>Change Address</button>
+                  </div>
+                </div>
+
+                <hr style={{ margin: '16px 0', borderColor: 'var(--fk-border)' }} />
+
+                {/* Delivery & Payment Summary */}
+                <div className="order-summary-section">
+                  <div className="summary-item">
+                    <span className="summary-label">Delivery Option:</span>
+                    <span className="summary-value">
+                      {deliveryOption === 'standard' ? '🚚 Standard Delivery (3-5 days)' : '⚡ Express Delivery (1-2 days)'}
+                    </span>
+                  </div>
+                  <div className="summary-item">
+                    <span className="summary-label">Payment Method:</span>
+                    <span className="summary-value">
+                      {paymentMethod === 'cod' ? '💵 Cash on Delivery' :
+                       paymentMethod === 'card' ? '💳 Credit/Debit Card' :
+                       paymentMethod === 'upi' ? '📱 UPI' : '🏦 Net Banking'}
+                    </span>
+                  </div>
                 </div>
 
                 <hr style={{ margin: '16px 0', borderColor: 'var(--fk-border)' }} />
@@ -188,24 +326,16 @@ const CheckoutPage = () => {
                   </div>
                 ))}
 
-                <hr style={{ margin: '16px 0', borderColor: 'var(--fk-border)' }} />
-
-                {/* Payment method (UI only — COD) */}
-                <div className="payment-section">
-                  <h3 style={{ fontSize: 15, fontWeight: 500, marginBottom: 12 }}>Payment Method</h3>
-                  <label className="payment-option selected">
-                    <input type="radio" checked readOnly />
-                    <span>💵 Cash on Delivery</span>
-                  </label>
+                <div className="step-navigation">
+                  <button className="back-btn" onClick={() => setStep(2)}>← Back to Payment</button>
+                  <button
+                    className="place-order-final-btn"
+                    onClick={handlePlaceOrder}
+                    disabled={placing}
+                  >
+                    {placing ? 'Placing Order...' : '✓ PLACE ORDER'}
+                  </button>
                 </div>
-
-                <button
-                  className="place-order-final-btn"
-                  onClick={handlePlaceOrder}
-                  disabled={placing}
-                >
-                  {placing ? 'Placing Order...' : '✓ PLACE ORDER'}
-                </button>
               </div>
             )}
           </div>
@@ -239,6 +369,37 @@ const CheckoutPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Payment Complete Animation */}
+      {showPaymentComplete && (
+        <div className="payment-complete-overlay">
+          <div className="payment-complete-modal">
+            <div className="checkmark-wrapper">
+              <div className="checkmark-circle">
+                <svg className="checkmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+            </div>
+            <h2>Payment Confirmed!</h2>
+            <p>Proceeding to review your order...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Thank You Modal */}
+      {showThankYou && (
+        <div className="thank-you-overlay">
+          <div className="thank-you-modal">
+            <div className="thank-you-content">
+              <div className="thank-you-icon">🎉</div>
+              <h2>Thank You for Shopping with Us!</h2>
+              <p>Your order has been placed successfully.</p>
+              <p className="thank-you-subtitle">Redirecting to home page...</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

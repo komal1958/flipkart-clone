@@ -1,10 +1,24 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContent';
+import { toast } from 'react-toastify';
 import './CartPage.css';
 
 const CartPage = () => {
   const { cart, loading, updateQuantity, removeFromCart } = useCart();
   const navigate = useNavigate();
+
+  const handleProceedToCheckout = () => {
+    try {
+      if (!cart || cart.length === 0) {
+        toast.warning('Your cart is empty. Please add items first.');
+        return;
+      }
+      navigate('/checkout');
+    } catch (error) {
+      console.error('Navigation error:', error);
+      toast.error('Failed to proceed. Please try again.');
+    }
+  };
 
   const cartItems = cart || [];
   const cartTotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -93,10 +107,10 @@ const CartPage = () => {
             );
           })}
 
-          {/* Place order bottom bar */}
+          {/* Proceed to checkout */}
           <div className="cart-bottom-bar">
-            <button className="place-order-btn" onClick={() => navigate('/checkout')}>
-              PLACE ORDER
+            <button className="proceed-checkout-btn" onClick={handleProceedToCheckout}>
+              PROCEED TO CHECKOUT
             </button>
           </div>
         </div>
@@ -128,8 +142,8 @@ const CartPage = () => {
           {savings > 0 && (
             <p className="summary-savings">You will save ₹{savings.toLocaleString()} on this order</p>
           )}
-          <button className="place-order-btn full-width" onClick={() => navigate('/checkout')}>
-            PLACE ORDER
+          <button className="proceed-checkout-btn full-width" onClick={handleProceedToCheckout}>
+            PROCEED TO CHECKOUT
           </button>
         </div>
       </div>

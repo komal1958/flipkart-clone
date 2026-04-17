@@ -33,15 +33,20 @@ export const CartProvider = ({ children }) => {
   }, []);
 
   const loadCart = async (sid) => {
+    if (!sid) return;
+
     try {
       setLoading(true);
       const response = await apiGetCart(sid);
-      if (response.data.success) {
+      if (response?.data?.success) {
         setCart(response.data.data || []);
+      } else {
+        setCart([]);
       }
     } catch (error) {
       console.error('Error loading cart:', error);
       setCart([]);
+      // Don't show toast on navigation to avoid spam
     } finally {
       setLoading(false);
     }
