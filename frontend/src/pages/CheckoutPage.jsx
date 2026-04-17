@@ -28,6 +28,7 @@ const CheckoutPage = () => {
   const [errors, setErrors] = useState({});
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [deliveryOption, setDeliveryOption] = useState('standard');
+  const [placing, setPlacing] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
   const [showPaymentComplete, setShowPaymentComplete] = useState(false);
 
@@ -105,6 +106,7 @@ const CheckoutPage = () => {
 
       // Show thank you message - redirect will be handled by useEffect
       setShowThankYou(true);
+      setPlacing(false);
 
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to place order. Please try again.');
